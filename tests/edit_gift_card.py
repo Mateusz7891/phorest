@@ -5,6 +5,7 @@ from builders.GiftCardBuilder import GiftCardBuilder
 from enums.URL import URL
 from pages.BuyGiftCardPage import BuyGiftCardPage
 from pages.CheckoutPage import CheckoutPage
+from pages.Footer import Footer
 from pages.PuchaseCompletePage import PurchaseCompletePage
 from pages.SummaryPage import SummaryPage
 
@@ -18,31 +19,41 @@ def edit_gift_card(playwright: Playwright) -> None:
 
     gift_card = GiftCardBuilder().with_send_to_me_data().build()
 
+    footer = Footer(page)
+
     buy_gift_page = BuyGiftCardPage(page)
     buy_gift_page.fill_gift_page_send_to_me(gift_card)
     buy_gift_page.assert_gift_page(gift_card)
+    footer.assertFooter()
 
     summary_page = SummaryPage(page)
     summary_page.assert_summary_page(gift_card)
+    footer.assertFooter()
     summary_page.clickEdit()
+    footer.assertFooter()
 
     edited_gift_card = GiftCardBuilder().with_send_to_me_data().build()
     buy_gift_page.fill_gift_page_send_to_me(edited_gift_card)
     buy_gift_page.assert_gift_page(edited_gift_card)
+    footer.assertFooter()
 
     summary_page.assert_summary_page(edited_gift_card)
+    footer.assertFooter()
     summary_page.clickConfirmDetails()
 
     checkout_page = CheckoutPage(page)
     checkout_page.assert_checkout_page(edited_gift_card)
+    footer.assertFooter()
 
     credit_card = CreditCardBuilder().with_test_data().build()
 
     checkout_page.fill_credit_card_details(credit_card)
+    footer.assertFooter()
     checkout_page.click_submit()
 
     purchase_complete_page = PurchaseCompletePage(page)
     purchase_complete_page.assertPurchaseCompletePage(edited_gift_card)
+    footer.assertFooter()
 
     context.close()
     browser.close()
